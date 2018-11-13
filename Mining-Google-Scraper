@@ -1,0 +1,53 @@
+# import packages
+from bs4 import BeautifulSoup
+import requests
+from IPython.display import display, HTML, Markdown
+import csv
+
+# read html file and store as soup 
+with open('data.html') as f:
+    search_html = f.read()
+search_html_soup = BeautifulSoup(search_html, 'html.parser')
+
+# create an acitivity list 
+for activity_name in search_html_soup.findAll('a'):
+    print(activity_name.text)
+activity_list = list(filter(                                       
+    lambda tag: 'mdl-grid' in tag.attrs.get('class', []),   
+    search_html_soup.findAll('div')                              
+))
+len(activity_list)
+print(activity_list[1].prettify())
+display(HTML(str(activity_list[1])))
+
+# store elements of activity list in .csv file
+csvfile = open('searchdata.csv', 'w')
+columnTitleRow = 'Activity Type, Term, Date, Time Stamp, Hour, Year, Month\n'
+csvfile.write(columnTitleRow)
+
+i = 1
+while (i < (len(activity_list) - 1)):
+    if activity_list[i].a != None:
+        activity_type = str(activity_list[i].contents[1].contents[0])[:-1]
+        search_term = str(activity_list[i].contents[1].contents[1].text)
+        search_term = search_term.replace("\"", "\"\"")
+        search_term = search_term.replace(",", "")
+        fulldate, timestamp = str(activity_list[i].contents[1].contents[3]).split(", ")
+        date, month, year = fulldate.split(" ")
+        fulltime, utc = timestamp.split(" ")
+        hour, minutes, seconds= fulltime.split(":")
+
+#     print(activity_type)
+#     print(search_term)
+#     print(fulldate)
+#     print(fulltime)
+#     print(hour)
+#     print(year)
+#     print(month)
+#     print("")
+    
+        row = activity_type + ',' + search_term + ',' + fulldate + ',' + fulltime + ',' + hour + ',' + year + ',' + month + '\n'
+        csvfile.write(row)
+    
+    i += 1 
+    

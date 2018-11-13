@@ -1,0 +1,79 @@
+# Visualization
+# Plots - Search Activity Frequency
+import pandas as pd
+from pandas import Series
+%matplotlib inline
+
+# read the .csv file 
+df = pd.read_csv('searchdata.csv', encoding='latin1',skipinitialspace=True)
+df.columns = ['Date', 'Term', 'Type', 'Time', 'Hour', 'Year', 'Month']
+df.head()
+
+# convert date column to datetime format 
+df['Date'] =  pd.to_datetime(df['Date'],
+                              format='%d %b %Y')
+print(df.info())  # date tme is now in datetime64 format
+
+# number of activities by year
+df.Year.value_counts().sort_index().plot.bar(title = "Number of activities by year", color = 'purple', rot = 0, figsize = (9, 6))
+
+# number of activities by day
+order = ['Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Saturday', 'Sunday']
+df['Day'] = df.Date.dt.weekday_name
+df.Day.value_counts().sort_index().reindex(order).plot.bar(title = "Number of activities by day", color = 'maroon', rot = 0, figsize = (9, 6))
+
+# 2018 data 
+tsEighteen = pd.to_datetime('1/1/2018')
+dfEighteen = df.loc[df.Date >= tsEighteen, ("Date", "Term")]
+dfEighteen['Month'] = dfEighteen.Date.dt.month
+dfEighteen.Month.value_counts().sort_index().plot.bar(title = "Number of activities by month (2018)", color = 'c', rot = 0)
+ax.set_xlabel("Month")
+
+# 2017 data
+tsSeventeen = pd.to_datetime('1/1/2017')
+dfSeventeen = df.loc[df.Date >= tsSeventeen, ("Date", "Term")]
+dfSeventeen['Month'] = dfSeventeen.Date.dt.month
+dfSeventeen.Month.value_counts().sort_index().plot.bar(title = "Number of activities by month (2017)", color = 'c', rot = 0)
+ax.set_xlabel("Month")
+
+# 2016 data
+tsSixteen = pd.to_datetime('1/1/2016')
+dfSixteen = df.loc[df.Date >= tsSixteen, ("Date", "Term")]
+dfSixteen['Month'] = dfSixteen.Date.dt.month
+dfSixteen.Month.value_counts().sort_index().plot.bar(title = "Number of activities by month (2016)", color = 'c', rot = 0)
+ax.set_xlabel("Month")
+
+# 2015 data
+tsFifteen = pd.to_datetime('1/1/2015')
+dfFifteen = df.loc[df.Date >= tsFifteen, ("Date", "Term")]
+dfFifteen['Month'] = dfFifteen.Date.dt.month
+ax = dfFifteen.Month.value_counts().sort_index().plot.bar(title = "Number of activities by month (2015)", color = 'c', rot = 0)
+ax.set_xlabel("Month")
+
+# Most common search terms 
+import collections
+import nltk
+from nltk.corpus import stopwords
+
+# get search only data
+dfSearch = df.loc[df.Type == 'Searched for', :]
+dfSearch.tail()
+
+# remove stopwords and put everything to lower case 
+stopWords = set(stopwords.words('english'))
+dfSearch['cleanedOne'] = dfSearch['Term'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stopWords)]))
+dfSearch['cleanedTwo'] = dfSearch.cleanedOne.apply(lambda x: x.lower())
+dfSearch
+
+# top most common words
+topten = collections.Counter(" ".join(dfSearch["cleanedTwo"]).split()).most_common(10)
+topten
+
+# plot top most common words
+import matplotlib.pyplot as plt
+x_val = [x[0] for x in topten]
+y_val = [x[1] for x in topten]
+
+plt.figure(figsize=(9,6))
+plt.bar(x_val, y_val)
+plt.show()
