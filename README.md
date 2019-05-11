@@ -1,4 +1,4 @@
-# Mining Google
+# Mining Google Search History
 The objective of this project is to practice Python 3 coding for data science. It consists of two components -  1) Web scraping using BeautifulSoup and 2) Data visualization using pandas, matplotlib and the natural language tool kit (NLTK).
 
 The data file is downloaded from Google's Web & App Activity page following the instructions in the following link: 
